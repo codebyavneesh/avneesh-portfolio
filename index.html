@@ -8,11 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0B0D10; --bg2:#101317; --surface:#15181D; --line:rgba(255,255,255,0.08);
     --text:#EDEBE6; --dim:#9BA0A6; --faint:#5B6066;
     --amber:#F2A93B; --teal:#4FD1C5; --coral:#E8615A;
+    --glow-amber:rgba(242,169,59,0.25);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth; background:var(--bg);}
@@ -46,7 +48,6 @@
   }
   .nav-links button:hover{color:var(--amber);}
 
-  /* REVEAL */
   .reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s cubic-bezier(.16,.84,.44,1), transform .7s cubic-bezier(.16,.84,.44,1); }
   .reveal.in{ opacity:1; transform:translateY(0); }
 
@@ -58,9 +59,11 @@
   h1.headline em{ font-style:normal; color:var(--amber); }
   .lead{ font-family:'Inter',sans-serif; font-size:16px; color:var(--dim); margin-top:22px; max-width:480px; line-height:1.7; }
   .btn-row{ display:flex; gap:16px; margin-top:32px; flex-wrap:wrap; }
-  .btn{ display:flex; align-items:center; gap:8px; border-radius:8px; padding:13px 22px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; cursor:pointer; border:none; }
+  .btn{ display:flex; align-items:center; gap:8px; border-radius:8px; padding:13px 22px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; cursor:pointer; border:none; transition:transform .2s, box-shadow .2s; }
   .btn-primary{ background:var(--amber); color:#1A1300; }
+  .btn-primary:hover{ box-shadow:0 8px 24px var(--glow-amber); transform:translateY(-2px); }
   .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--line); }
+  .btn-outline:hover{ border-color:var(--amber); color:var(--amber); }
   #hero-canvas{ width:100%; height:420px; }
   .ticker{ display:flex; gap:28px; margin-top:46px; flex-wrap:wrap; border-top:1px solid var(--line); padding-top:22px; }
   .ticker-item{ display:flex; align-items:center; gap:10px; }
@@ -70,7 +73,6 @@
   .bob{ animation:bob 1.8s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
 
-  /* SECTION HEADS */
   .section{ padding:110px 32px; }
   .kicker{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--teal); letter-spacing:2px; }
   .h2{ font-family:'Space Grotesk',sans-serif; font-size:clamp(1.8rem,3vw,2.6rem); margin:12px 0 20px; }
@@ -96,22 +98,12 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:5;
     box-shadow:0 0 40px rgba(242,169,59,0.08);
   }
-  .orbit-node{
-    position:absolute; top:50%; left:50%; width:92px; height:92px; margin-left:-46px; margin-top:-46px;
-    cursor:pointer; transition:opacity .25s ease;
-  }
-  .orbit-node-inner{
-    width:100%; height:100%; border-radius:50%; background:var(--surface); border:1px solid var(--line);
-    display:flex; align-items:center; justify-content:center; text-align:center; padding:6px;
-    transition:border-color .25s, box-shadow .25s;
-  }
+  .orbit-node{ position:absolute; top:50%; left:50%; width:92px; height:92px; margin-left:-46px; margin-top:-46px; cursor:pointer; transition:opacity .25s ease; }
+  .orbit-node-inner{ width:100%; height:100%; border-radius:50%; background:var(--surface); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; text-align:center; padding:6px; transition:border-color .25s, box-shadow .25s; }
   .orbit-node-inner span{ font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text); transition:color .25s; }
   .orbit-node.hover .orbit-node-inner{ border-color:var(--amber); box-shadow:0 0 26px rgba(242,169,59,0.25); }
   .orbit-node.hover .orbit-node-inner span{ color:var(--amber); }
-  .orbit-tip{
-    position:absolute; top:104%; left:50%; transform:translateX(-50%); width:160px; background:var(--bg2);
-    border:1px solid var(--line); border-radius:8px; padding:8px 10px; text-align:center; display:none;
-  }
+  .orbit-tip{ position:absolute; top:104%; left:50%; transform:translateX(-50%); width:160px; background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; text-align:center; display:none; }
   .orbit-node.hover .orbit-tip{ display:block; }
   .orbit-tip .pct{ font-family:'JetBrains Mono',monospace; color:var(--teal); font-size:15px; font-weight:600; }
   .orbit-tip .note{ font-family:'Inter',sans-serif; color:var(--dim); font-size:11px; margin-top:2px; }
@@ -134,14 +126,13 @@
   .proj-links{ margin-top:auto; display:flex; gap:14px; }
   .proj-link{ display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px; }
 
-  /* STAT BLOCKS */
   .stat-block-row{ display:flex; align-items:center; justify-content:center; gap:26px; height:100%; }
   .stat-block{ text-align:center; }
   .stat-num{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:34px; color:var(--amber); line-height:1; text-shadow:0 0 24px rgba(242,169,59,0.25); }
   .stat-label-sm{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--dim); margin-top:6px; letter-spacing:.3px; }
   .stat-divider{ width:1px; height:34px; background:var(--line); }
 
-  /* VIZ CAROUSEL */
+  /* CAROUSEL */
   .carousel-wrap{ max-width:640px; margin:0 auto; }
   .carousel-window{ overflow:hidden; border-radius:12px; border:1px solid var(--line); background:var(--surface); }
   .carousel-track{ display:flex; transition:transform .55s cubic-bezier(.2,.8,.2,1); }
@@ -162,18 +153,69 @@
   .tl-title{ font-family:'Space Grotesk',sans-serif; font-size:17px; margin-top:6px; }
   .tl-desc{ color:var(--dim); font-size:14px; margin-top:6px; line-height:1.6; }
 
+  /* ═══════════════ CLIENT PORTAL ═══════════════ */
+  .portal-wrap{ max-width:720px; margin:50px auto 0; }
+  .auth-panel, .dashboard{
+    background:linear-gradient(155deg, var(--surface), var(--bg2));
+    border:1px solid var(--line); border-radius:18px; padding:34px;
+    box-shadow:0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+    position:relative; overflow:hidden;
+  }
+  .auth-panel::before, .dashboard::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, var(--amber), transparent); opacity:.5;
+  }
+  .auth-tabs{ display:flex; gap:6px; margin-bottom:24px; padding:5px; background:var(--bg2); border-radius:11px; border:1px solid var(--line); }
+  .auth-tab{ flex:1; background:none; border:none; padding:11px; color:var(--dim); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; border-radius:8px; cursor:pointer; transition:all .25s; }
+  .auth-tab.active{ background:linear-gradient(135deg, var(--amber), #e09620); color:#1A1300; box-shadow:0 4px 14px var(--glow-amber); }
+  .auth-panel form{ display:grid; gap:12px; }
+  .auth-msg{ margin-top:16px; font-size:13px; font-family:'JetBrains Mono',monospace; text-align:center; min-height:18px; transition:color .2s; }
+  .auth-msg.error{ color:var(--coral); }
+  .auth-msg.success{ color:var(--teal); }
+
+  .dash-head{ display:flex; justify-content:space-between; align-items:center; padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:26px; gap:16px; flex-wrap:wrap; }
+  .upload-zone{
+    border:2px dashed var(--line); border-radius:14px; padding:42px 20px; text-align:center;
+    cursor:pointer; transition:all .25s; background:rgba(255,255,255,0.01);
+  }
+  .upload-zone:hover, .upload-zone.drag{ border-color:var(--amber); background:rgba(242,169,59,0.04); }
+  .upload-zone.drag{ transform:scale(1.01); }
+  .upload-zone svg{ color:var(--amber); margin-bottom:14px; }
+  .drop-text{ font-family:'Space Grotesk',sans-serif; font-size:16.5px; font-weight:600; margin-bottom:6px; }
+  .drop-text span{ color:var(--amber); text-decoration:underline; text-underline-offset:3px; }
+  .drop-hint{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--faint); letter-spacing:.3px; }
+
+  .upload-progress{ margin-top:18px; }
+  .progress-bar{ height:6px; background:var(--bg2); border-radius:3px; overflow:hidden; margin-bottom:8px; border:1px solid var(--line); }
+  #progressFill{ height:100%; background:linear-gradient(90deg, var(--amber), var(--teal)); width:0%; transition:width .3s; border-radius:3px; }
+
+  .files-head{ display:flex; justify-content:space-between; align-items:center; margin:32px 0 16px; }
+  .files-list{ display:grid; gap:10px; }
+  .file-item{
+    display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--bg2);
+    border:1px solid var(--line); border-radius:12px; transition:all .2s;
+  }
+  .file-item:hover{ border-color:rgba(242,169,59,0.35); background:rgba(242,169,59,0.03); }
+  .file-icon{ width:40px; height:40px; border-radius:9px; background:rgba(242,169,59,0.1); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--amber); }
+  .file-info{ flex:1; min-width:0; }
+  .file-name{ font-family:'Inter',sans-serif; font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .file-meta{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--faint); margin-top:3px; }
+  .file-actions{ display:flex; gap:8px; }
+  .icon-btn{ width:34px; height:34px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--dim); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+  .icon-btn:hover{ color:var(--amber); border-color:var(--amber); background:rgba(242,169,59,0.05); }
+  .icon-btn.danger:hover{ color:var(--coral); border-color:var(--coral); background:rgba(232,97,90,0.05); }
+  .empty-state{ text-align:center; padding:34px; color:var(--faint); font-family:'JetBrains Mono',monospace; font-size:12px; border:1px dashed var(--line); border-radius:12px; }
+  .admin-badge{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:6px; background:rgba(79,209,197,0.12); border:1px solid rgba(79,209,197,0.3); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--teal); letter-spacing:.5px; }
+
   /* CONTACT */
   .contact-form{ display:grid; gap:14px; text-align:left; max-width:720px; margin:0 auto; }
   .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   input, textarea{
-    background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 14px; color:var(--text); font-size:14px; font-family:'Inter',sans-serif; width:100%;
+    background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 14px; color:var(--text); font-size:14px; font-family:'Inter',sans-serif; width:100%; transition:border-color .2s;
   }
   input:focus, textarea:focus{ outline:none; border-color:var(--amber); }
   .social-row{ display:flex; justify-content:center; gap:22px; margin-top:40px; }
-  .social-btn{
-    width:42px; height:42px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
-    color:var(--dim); text-decoration:none; transition:color .2s, border-color .2s;
-  }
+  .social-btn{ width:42px; height:42px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--dim); text-decoration:none; transition:color .2s, border-color .2s; }
   .social-btn:hover{ color:var(--amber); border-color:var(--amber); }
 
   footer{ text-align:center; padding:24px 32px; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--faint); }
@@ -184,11 +226,8 @@
     outline:2px solid var(--amber); outline-offset:2px;
   }
   @media (prefers-reduced-motion: reduce){
-    .reveal{ transition:none; }
-    .bob{ animation:none; }
-    .flip-inner, .carousel-track{ transition:none; }
+    .reveal{ transition:none; } .bob{ animation:none; } .flip-inner, .carousel-track{ transition:none; }
   }
-
   @media (max-width:860px){
     .hero-grid, .about-grid{ grid-template-columns:1fr !important; }
     .project-grid{ grid-template-columns:1fr 1fr !important; }
@@ -197,6 +236,7 @@
   }
   @media (max-width:560px){
     .project-grid{ grid-template-columns:1fr !important; }
+    .auth-panel, .dashboard{ padding:22px; }
   }
 </style>
 </head>
@@ -209,7 +249,7 @@
     <button data-target="skills">Skills</button>
     <button data-target="work">Work</button>
     <button data-target="viz">Visuals</button>
-    <button data-target="timeline">Timeline</button>
+    <button data-target="portal">Portal</button>
     <button data-target="contact">Contact</button>
   </div>
 </nav>
@@ -226,7 +266,7 @@
       </p>
       <div class="btn-row">
         <button class="btn btn-primary" data-target="work">View My Work ↗</button>
-        <button class="btn btn-outline" data-target="contact">Get in Touch</button>
+        <button class="btn btn-outline" data-target="portal">Client Portal</button>
       </div>
       <div class="ticker">
         <div class="ticker-item">
@@ -336,21 +376,78 @@
   <div class="timeline" id="timeline-list"></div>
 </section>
 
+<!-- ═══════════════ CLIENT PORTAL ═══════════════ -->
+<section id="portal" class="section grid-bg" style="text-align:center;">
+  <div class="reveal" style="max-width:720px; margin:0 auto;">
+    <div class="kicker">CLIENT PORTAL</div>
+    <h2 class="h2">Your files. Securely yours.</h2>
+    <p style="color:var(--dim); max-width:560px; margin:0 auto; line-height:1.7;">
+      Login to upload project files — Excel, CSV, PDF, or images. Files are stored privately, and only you (and I) can access them.
+    </p>
+  </div>
+
+  <div class="portal-wrap reveal">
+
+    <!-- AUTH PANEL -->
+    <div id="authPanel" class="auth-panel">
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-auth="login">Login</button>
+        <button type="button" class="auth-tab" data-auth="signup">Sign Up</button>
+      </div>
+      <form id="authForm">
+        <input type="email" id="authEmail" placeholder="you@example.com" required autocomplete="email" />
+        <input type="password" id="authPass" placeholder="Password (min 6 characters)" required minlength="6" autocomplete="current-password" />
+        <button type="submit" class="btn btn-primary" id="authBtn" style="justify-content:center; width:100%;">Login →</button>
+      </form>
+      <div id="authMsg" class="auth-msg"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="dashboard" style="display:none;">
+      <div class="dash-head">
+        <div style="text-align:left;">
+          <div class="mono" style="font-size:10.5px; color:var(--teal); letter-spacing:1.5px;">SIGNED IN AS</div>
+          <div class="display" style="font-size:17px; margin-top:4px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span id="userEmail">—</span>
+            <span id="adminBadge" class="admin-badge" style="display:none;">● ADMIN</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" id="logoutBtn" style="padding:9px 16px; font-size:13px;">Logout</button>
+      </div>
+
+      <div id="uploadZone" class="upload-zone">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="drop-text">Drag &amp; drop or <span>browse</span></div>
+        <div class="drop-hint">JPG · PNG · WEBP — max 5 MB</div>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden />
+      </div>
+
+      <div id="uploadProgress" class="upload-progress" style="display:none;">
+        <div class="progress-bar"><div id="progressFill"></div></div>
+        <div class="mono" style="font-size:11px; color:var(--dim);" id="progressText">Uploading…</div>
+      </div>
+
+      <div class="files-head">
+        <div class="kicker" style="color:var(--amber);" id="filesHeadText">YOUR FILES</div>
+        <div class="mono" style="font-size:11px; color:var(--faint);" id="filesCount">0 files</div>
+      </div>
+      <div id="filesList" class="files-list"></div>
+    </div>
+
+  </div>
+</section>
+
 <!-- CONTACT -->
-<section id="contact" class="section grid-bg" style="text-align:center;">
+<section id="contact" class="section" style="text-align:center;">
   <div class="reveal" style="max-width:720px; margin:0 auto;">
     <div class="kicker">CONTACT</div>
     <h2 class="h2">Have a dataset worth exploring?</h2>
     <p style="color:var(--dim); margin-bottom:40px;">Send a message — I read every one.</p>
   </div>
   <form class="reveal contact-form" action="https://formsubmit.co/avneesh.codes@gmail.com" method="POST" id="contactForm">
-    <!-- Anti-spam -->
     <input type="hidden" name="_captcha" value="false">
-    <!-- Thank you page (optional - remove if you don't have one) -->
     <input type="hidden" name="_next" value="https://avneesh.framer.app/thank-you">
-    <!-- Email subject -->
     <input type="hidden" name="_subject" value="📩 New Portfolio Message from Avneesh's Site!">
-    
     <div class="form-row">
       <input required type="text" name="name" placeholder="Your Name" id="fName"/>
       <input required type="email" name="email" placeholder="Your Email" id="fEmail"/>
@@ -376,10 +473,15 @@
 </footer>
 
 <script>
-/* ============================================================
-   DATA — All projects with unique visuals
-   ============================================================ */
+/* ══════════════════════════════════════════════════════════
+   CONFIG — Supabase
+   ══════════════════════════════════════════════════════════ */
+const SUPABASE_URL = 'https://mwbpdpwjplbdhzqvxtglo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13YnBkd3BqbGJkaHpxdnh0Z2xvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxOTIyMDUsImV4cCI6MjEwNDc2ODIwNX0.PzbDj00e-1El0nnkW2-fAYMtz_thxD8PZoX9Aopcmxw';
+const ADMIN_EMAIL = 'avneesh.codes@gmail.com';
+const BUCKET = 'client-files';
 
+/* ---------- Existing data ---------- */
 const skillsData = [
   { name:'Python',           stat:'6 projects',      note:'ETL pipelines, EDA, ML model' },
   { name:'SQL & MySQL',      stat:'6 projects',      note:'Window functions, CTEs, 70+ queries' },
@@ -390,129 +492,56 @@ const skillsData = [
 ];
 
 const projectsData = [
-  {
-    title:'Telco Customer Churn Analysis',
-    tags:['Python','MySQL','scikit-learn','Power BI'],
-    visual: { 
-      type:'donut', 
-      labels:['Retained','Churned'], 
-      data:[73,27], 
-      colors:['#4FD1C5','#E8615A'],
-      caption:'27% churn rate — Month-to-month contracts churn at 14× the rate of two-year contracts.'
-    },
-    desc:'8-phase pipeline — cleaning, MySQL schema, SQL analysis, EDA, a churn-prediction model, Plotly visuals, and a 4-page Power BI dashboard. The dashboard surfaced ₹137.01K of monthly recurring revenue at risk across roughly 2,000 high-risk customers.',
-    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/telco-customer-churn-analytics' }]
-  },
-  {
-    title:'Instacart Market Basket Analysis',
-    tags:['MySQL','SQL','Pandas','Power BI'],
-    visual: { 
-      type:'bar', 
-      labels:['Banana','Organic Bananas','Strawberries','Avocado','Raspberries'], 
-      data:[4914,4154,3278,2767,2327], 
-      colors:['#F2A93B','#4FD1C5','#E8615A','#9BA0A6','#F2A93B'],
-      caption:'Top 5 products by order count — Bananas dominate with 4,914 orders.'
-    },
+  { title:'Telco Customer Churn Analysis', tags:['Python','MySQL','scikit-learn','Power BI'],
+    visual:{ type:'donut', labels:['Retained','Churned'], data:[73,27], colors:['#4FD1C5','#E8615A'], caption:'27% churn rate.' },
+    desc:'8-phase pipeline — cleaning, MySQL schema, SQL analysis, EDA, a churn-prediction model, Plotly visuals, and a 4-page Power BI dashboard. Surfaced ₹137.01K monthly revenue at risk.',
+    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/telco-customer-churn-analytics' }] },
+  { title:'Instacart Market Basket Analysis', tags:['MySQL','SQL','Pandas','Power BI'],
+    visual:{ type:'bar', labels:['Banana','Org. Banana','Strawberries','Avocado','Rasp.'], data:[4914,4154,3278,2767,2327], colors:['#F2A93B','#4FD1C5','#E8615A','#9BA0A6','#F2A93B'], caption:'Top products by order count.' },
     desc:'A full pipeline from ~32 million raw Kaggle order rows to a MySQL database, 20 advanced SQL queries (CTEs, window functions, self-joins), Python EDA, and a dark-themed 4-page Power BI dashboard.',
-    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/instacart-market-basket-analysis-project' }]
-  },
-  {
-    title:'Brazilian E-Commerce (Olist) ETL Analytics',
-    tags:['Python','ETL','MySQL','Power BI'],
-    visual: { 
-      type:'bar', 
-      labels:['Health & Beauty','Sports & Leisure','Furniture','Electronics','Books'], 
-      data:[4200,3800,2500,2100,1800], 
-      colors:['#4FD1C5','#F2A93B','#E8615A','#9BA0A6','#4FD1C5'],
-      caption:'Top 5 categories by sales — Health & Beauty leads with 4,200 orders.'
-    },
-    desc:"A modular Python ETL pipeline (extract → transform → load) into MySQL, 50+ SQL queries, Python visualizations, and a dark-themed multi-page Power BI dashboard — the pattern I've reused in every project since.",
-    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/brazilian-ecommerce-etl-analytics' }]
-  },
-  {
-    title:'Superstore Sales Analytics',
-    tags:['SQL','Python','Power BI'],
-    visual: { 
-      type:'bar', 
-      labels:['East','West','South','Central'], 
-      data:[320000,280000,180000,150000], 
-      colors:['#4FD1C5','#F2A93B','#E8615A','#9BA0A6'],
-      caption:'East region leads in sales at ₹320K — but profit margins need investigation.'
-    },
+    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/instacart-market-basket-analysis-project' }] },
+  { title:'Brazilian E-Commerce (Olist) ETL', tags:['Python','ETL','MySQL','Power BI'],
+    visual:{ type:'bar', labels:['Health','Sports','Furniture','Electronics','Books'], data:[4200,3800,2500,2100,1800], colors:['#4FD1C5','#F2A93B','#E8615A','#9BA0A6','#4FD1C5'], caption:'Top 5 categories by sales.' },
+    desc:'Modular Python ETL pipeline (extract → transform → load) into MySQL, 50+ SQL queries, Python visualizations, and a dark-themed multi-page Power BI dashboard.',
+    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/brazilian-ecommerce-etl-analytics' }] },
+  { title:'Superstore Sales Analytics', tags:['SQL','Python','Power BI'],
+    visual:{ type:'bar', labels:['East','West','South','Central'], data:[320000,280000,180000,150000], colors:['#4FD1C5','#F2A93B','#E8615A','#9BA0A6'], caption:'East region leads in sales.' },
     desc:'Built as focused interview prep: a SQL + EDA + Power BI pipeline ending in a 3-page dashboard. Open source on GitHub.',
-    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/superstore_project' }]
-  },
-  {
-    title:'HR Attrition Analysis',
-    tags:['MySQL','Python','DAX'],
-    visual: { 
-      type:'donut', 
-      labels:['Retained','Attrition'], 
-      data:[83,17], 
-      colors:['#4FD1C5','#E8615A'],
-      caption:'17% overall attrition — Sales department has the highest attrition rate.'
-    },
-    desc:'Analyzed the IBM HR Attrition dataset — MySQL for storage, Python for cleaning, and a Power BI dashboard with custom DAX measures for attrition rate and satisfaction scoring.',
-    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/hr-attrition-analysis' }]
-  },
-  {
-    title:'End-to-End Sales Analytics',
-    tags:['Python','SQLAlchemy','SQL'],
-    visual: { 
-      type:'bar', 
-      labels:['Product A','Product B','Product C','Product D','Product E'], 
-      data:[58000,42000,31000,28000,15000], 
-      colors:['#F2A93B','#4FD1C5','#E8615A','#9BA0A6','#F2A93B'],
-      caption:'Top 5 products by revenue — Product A leads with ₹58K in sales.'
-    },
+    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/superstore_project' }] },
+  { title:'HR Attrition Analysis', tags:['MySQL','Python','DAX'],
+    visual:{ type:'donut', labels:['Retained','Attrition'], data:[83,17], colors:['#4FD1C5','#E8615A'], caption:'17% overall attrition.' },
+    desc:'Analyzed the IBM HR Attrition dataset — MySQL for storage, Python for cleaning, and a Power BI dashboard with custom DAX measures.',
+    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/hr-attrition-analysis' }] },
+  { title:'End-to-End Sales Analytics', tags:['Python','SQLAlchemy','SQL'],
+    visual:{ type:'bar', labels:['Product A','Product B','Product C','Product D','Product E'], data:[58000,42000,31000,28000,15000], colors:['#F2A93B','#4FD1C5','#E8615A','#9BA0A6','#F2A93B'], caption:'Top 5 products by revenue.' },
     desc:'Designed a normalized relational schema for a retail/inventory dataset and built a SQLAlchemy-based ETL pipeline to load and query it.',
-    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/end-to-end-sales-analytics-project' }]
-  }
+    links:[{ label:'GitHub', url:'https://github.com/codebyavneesh/end-to-end-sales-analytics-project' }] }
 ];
 
 const carouselData = [
-  {
-    type:'bar', project:'Telco Churn Analysis',
-    labels:['Month-to-month','Two-year'], data:[43,3], colors:['#F2A93B','#4FD1C5'],
-    caption:'Month-to-month customers churn at more than 14× the rate of two-year contracts — the clearest lever for retention offers.'
-  },
-  {
-    type:'bar', project:'Telco Churn Analysis',
-    labels:['Senior citizens','Other customers'], data:[42,24], colors:['#E8615A','#4FD1C5'],
-    caption:'Senior citizens churn 18 points higher than the rest of the base — worth a dedicated retention flow.'
-  },
-  {
-    type:'bar', project:'Telco Churn Analysis',
-    labels:['Total MRR (₹K)','MRR at risk (₹K)'], data:[456.12,137.01], colors:['#4FD1C5','#E8615A'],
-    caption:'About 30% of monthly recurring revenue sits with the ~2,000 high-risk customers.'
-  },
-  {
-    type:'stats', project:'Instacart Market Basket Analysis',
-    items:[{ num:'32M+', label:'rows processed' },{ num:'20', label:'SQL queries' },{ num:'4', label:'dashboard pages' }],
-    caption:'Scaling the same pipeline pattern from thousands of rows to tens of millions.'
-  }
+  { type:'bar', project:'Telco Churn Analysis', labels:['Month-to-month','Two-year'], data:[43,3], colors:['#F2A93B','#4FD1C5'], caption:'Month-to-month customers churn at 14× the rate of two-year contracts.' },
+  { type:'bar', project:'Telco Churn Analysis', labels:['Senior citizens','Other customers'], data:[42,24], colors:['#E8615A','#4FD1C5'], caption:'Senior citizens churn 18 points higher than the rest of the base.' },
+  { type:'bar', project:'Telco Churn Analysis', labels:['Total MRR (₹K)','MRR at risk (₹K)'], data:[456.12,137.01], colors:['#4FD1C5','#E8615A'], caption:'About 30% of monthly recurring revenue sits with ~2,000 high-risk customers.' },
+  { type:'stats', project:'Instacart', items:[{ num:'32M+', label:'rows processed' },{ num:'20', label:'SQL queries' },{ num:'4', label:'dashboard pages' }], caption:'Scaling the same pipeline pattern from thousands of rows to tens of millions.' }
 ];
 
 const timelineData = [
-  { phase:'FOUNDATIONS', title:'Diploma in Computer Science begins', desc:'Started a Computer Science diploma at Government Polytechnic, Mau (UP); picked up Python fundamentals through early CLI projects — an ATM simulator, an expense tracker, a library management system.' },
-  { phase:'FIRST PROJECTS', title:'First analytics projects', desc:'Hands-on with real datasets for the first time: FIFA World Cup sales, e-commerce sales, Zomato restaurant data, and a mobile sales dashboard — all Python, MySQL, and Power BI.' },
-  { phase:'STRUCTURED SQL', title:'Deep-diving into SQL', desc:'Worked through a 30-hour SQL course and built practice schemas covering window functions, CTEs, stored procedures, triggers, and views.' },
-  { phase:'FULL PIPELINES', title:'End-to-end ETL pipelines', desc:'Completed the Brazilian E-Commerce (Olist) project — the modular ETL pattern reused since — followed by HR Attrition and Retail/Inventory analytics projects.' },
-  { phase:'SCALING UP', title:'Millions of rows', desc:'Completed the Instacart Market Basket Analysis on a ~32M-row dataset: MySQL, 20 advanced SQL queries, and a 4-page Power BI dashboard.' },
-  { phase:'ML + DASHBOARDS', title:'Telco Customer Churn Analysis', desc:'An 8-phase pipeline from data cleaning through a churn-prediction ML model to a 4-page Power BI dashboard and a full README.' },
-  { phase:'NOW', title:'Power BI/DAX depth + internship prep', desc:'Building depth in Power BI and DAX, preparing case studies for interviews, and applying for data analyst internships.' }
+  { phase:'FOUNDATIONS', title:'Diploma in Computer Science begins', desc:'Started CS diploma at Government Polytechnic, Mau (UP); picked up Python fundamentals via CLI projects.' },
+  { phase:'FIRST PROJECTS', title:'First analytics projects', desc:'FIFA World Cup sales, e-commerce sales, Zomato restaurant data, mobile sales dashboard — Python, MySQL, Power BI.' },
+  { phase:'STRUCTURED SQL', title:'Deep-diving into SQL', desc:'30-hour SQL course + practice schemas: window functions, CTEs, stored procedures, triggers, views.' },
+  { phase:'FULL PIPELINES', title:'End-to-end ETL pipelines', desc:'Brazilian E-Commerce (Olist) project — the modular ETL pattern reused since. Followed by HR Attrition and Retail analytics.' },
+  { phase:'SCALING UP', title:'Millions of rows', desc:'Instacart Market Basket Analysis on a ~32M-row dataset: MySQL, 20 advanced SQL queries, 4-page Power BI dashboard.' },
+  { phase:'ML + DASHBOARDS', title:'Telco Customer Churn Analysis', desc:'8-phase pipeline from data cleaning through an ML churn model to a 4-page Power BI dashboard.' },
+  { phase:'NOW', title:'Power BI/DAX depth + internship prep', desc:'Building depth in Power BI and DAX, prepping case studies, and applying for data analyst internships.' }
 ];
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ============================================================
-   HERO — three.js scene
-   ============================================================ */
+/* HERO — three.js */
 (function initHeroScene(){
   const container = document.getElementById('hero-canvas');
   if(!container || !window.THREE) return;
   const w = container.clientWidth || 600, h = container.clientHeight || 420;
-
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, w/h, 0.1, 100);
   camera.position.z = 9;
@@ -543,15 +572,12 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   scene.add(core);
 
   function render(){
-    points.rotation.y += 0.0018;
-    points.rotation.x += 0.0006;
-    core.rotation.y -= 0.0026;
-    core.rotation.x += 0.0012;
+    points.rotation.y += 0.0018; points.rotation.x += 0.0006;
+    core.rotation.y -= 0.0026; core.rotation.x += 0.0012;
     renderer.render(scene, camera);
     if(!prefersReducedMotion) requestAnimationFrame(render);
   }
   render();
-
   window.addEventListener('resize', () => {
     const nw = container.clientWidth, nh = container.clientHeight;
     if(!nw || !nh) return;
@@ -561,9 +587,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   });
 })();
 
-/* ============================================================
-   ABOUT — tilt card
-   ============================================================ */
+/* ABOUT tilt */
 (function initTilt(){
   const card = document.getElementById('tiltCard');
   if(!card || prefersReducedMotion) return;
@@ -576,13 +600,10 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   card.addEventListener('mouseleave', () => { card.style.transform = 'rotateY(0) rotateX(0)'; });
 })();
 
-/* ============================================================
-   SKILLS ORBIT
-   ============================================================ */
+/* SKILLS ORBIT */
 (function initOrbit(){
   const wrap = document.getElementById('skills-wrap');
   if(!wrap) return;
-
   function layout(){
     wrap.querySelectorAll('.orbit-node').forEach(n => n.remove());
     const w = wrap.clientWidth || 480, h = wrap.clientHeight || 420;
@@ -590,18 +611,14 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     const n = skillsData.length;
     skillsData.forEach((s,i) => {
       const angle = (i/n)*Math.PI*2 - Math.PI/2;
-      const tx = radius*Math.cos(angle);
-      const ty = radius*Math.sin(angle);
+      const tx = radius*Math.cos(angle), ty = radius*Math.sin(angle);
       const node = document.createElement('div');
       node.className = 'orbit-node';
       node.style.transform = `translate(${tx}px, ${ty}px)`;
       node.tabIndex = 0;
       node.setAttribute('role','button');
       node.setAttribute('aria-label', `${s.name}: ${s.stat}, ${s.note}`);
-      node.innerHTML = `
-        <div class="orbit-node-inner"><span>${s.name}</span></div>
-        <div class="orbit-tip"><div class="pct">${s.stat}</div><div class="note">${s.note}</div></div>
-      `;
+      node.innerHTML = `<div class="orbit-node-inner"><span>${s.name}</span></div><div class="orbit-tip"><div class="pct">${s.stat}</div><div class="note">${s.note}</div></div>`;
       const toggle = () => node.classList.toggle('hover');
       node.addEventListener('mouseenter', () => node.classList.add('hover'));
       node.addEventListener('mouseleave', () => node.classList.remove('hover'));
@@ -614,32 +631,22 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   window.addEventListener('resize', layout);
 })();
 
-/* ============================================================
-   PROJECTS — flip cards with visuals (FIXED)
-   ============================================================ */
+/* PROJECTS */
 (function initProjects(){
   const grid = document.getElementById('project-grid');
   if(!grid) return;
-
   projectsData.forEach((p, idx) => {
     const outer = document.createElement('div');
     outer.className = 'flip-outer reveal';
     outer.tabIndex = 0;
     outer.setAttribute('role','button');
     outer.setAttribute('aria-label', `${p.title} — tap for details`);
-
     let visualHTML;
-    if(p.visual.type === 'donut') {
-      visualHTML = `<div class="chart-box"><canvas id="chart-${idx}"></canvas></div>`;
-    } else if(p.visual.type === 'bar') {
+    if(p.visual.type === 'donut' || p.visual.type === 'bar') {
       visualHTML = `<div class="chart-box"><canvas id="chart-${idx}"></canvas></div>`;
     } else {
-      visualHTML = `<div class="chart-box stat-block-row">${p.visual.items.map((it, i) => `
-          ${i > 0 ? '<div class="stat-divider"></div>' : ''}
-          <div class="stat-block"><div class="stat-num">${it.num}</div><div class="stat-label-sm">${it.label}</div></div>
-        `).join('')}</div>`;
+      visualHTML = `<div class="chart-box stat-block-row">${p.visual.items.map((it, i) => `${i > 0 ? '<div class="stat-divider"></div>' : ''}<div class="stat-block"><div class="stat-num">${it.num}</div><div class="stat-label-sm">${it.label}</div></div>`).join('')}</div>`;
     }
-
     outer.innerHTML = `
       <div class="flip-inner">
         <div class="flip-face flip-front">
@@ -653,72 +660,49 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
           <div class="proj-desc">${p.desc}</div>
           <div class="proj-links">${p.links.map(l => `<a class="proj-link" href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('')}</div>
         </div>
-      </div>
-    `;
+      </div>`;
     const toggle = () => outer.classList.toggle('flipped');
     outer.addEventListener('click', (e) => { if(e.target.closest('.proj-link')) return; toggle(); });
     outer.addEventListener('keydown', (e) => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } });
     grid.appendChild(outer);
   });
-
-  // Charts render after DOM update
   setTimeout(() => {
     projectsData.forEach((p, idx) => {
       const ctx = document.getElementById(`chart-${idx}`);
       if(!ctx || !window.Chart) return;
-      
       if(p.visual.type === 'donut') {
-        new Chart(ctx, {
-          type:'doughnut',
+        new Chart(ctx, { type:'doughnut',
           data:{ labels:p.visual.labels, datasets:[{ data:p.visual.data, backgroundColor:p.visual.colors, borderWidth:0 }] },
-          options:{
-            responsive:true, maintainAspectRatio:false, cutout:'68%',
-            plugins:{ legend:{ display:true, position:'bottom', labels:{ color:'#9BA0A6', font:{ family:'Inter', size:10 }, boxWidth:10, padding:8 } } }
-          }
-        });
+          options:{ responsive:true, maintainAspectRatio:false, cutout:'68%',
+            plugins:{ legend:{ display:true, position:'bottom', labels:{ color:'#9BA0A6', font:{ family:'Inter', size:10 }, boxWidth:10, padding:8 } } } } });
       } else if(p.visual.type === 'bar') {
-        new Chart(ctx, {
-          type:'bar',
+        new Chart(ctx, { type:'bar',
           data:{ labels:p.visual.labels, datasets:[{ data:p.visual.data, backgroundColor:p.visual.colors, borderRadius:6, maxBarThickness:40 }] },
-          options:{
-            responsive:true, maintainAspectRatio:false,
+          options:{ responsive:true, maintainAspectRatio:false,
             plugins:{ legend:{ display:false } },
-            scales:{
-              x:{ ticks:{ color:'#9BA0A6', font:{ family:'Inter', size:9 } }, grid:{ display:false } },
-              y:{ ticks:{ color:'#9BA0A6', font:{ family:'JetBrains Mono', size:9 } }, grid:{ color:'rgba(255,255,255,0.06)' } }
-            }
-          }
-        });
+            scales:{ x:{ ticks:{ color:'#9BA0A6', font:{ family:'Inter', size:9 } }, grid:{ display:false } },
+              y:{ ticks:{ color:'#9BA0A6', font:{ family:'JetBrains Mono', size:9 } }, grid:{ color:'rgba(255,255,255,0.06)' } } } } });
       }
     });
   }, 300);
 })();
 
-/* ============================================================
-   VIZ CAROUSEL
-   ============================================================ */
+/* CAROUSEL */
 (function initCarousel(){
   const track = document.getElementById('carousel-track');
   const dotsWrap = document.getElementById('carDots');
   if(!track || !dotsWrap) return;
   let carIndex = 0;
-
   carouselData.forEach((s, idx) => {
     const slide = document.createElement('div');
     slide.className = 'carousel-slide';
     const bodyHTML = s.type === 'bar'
       ? `<div class="chart-box" style="height:190px;"><canvas id="car-chart-${idx}"></canvas></div>`
       : `<div class="chart-box stat-block-row" style="height:190px;">${s.items.map(it => `<div class="stat-block"><div class="stat-num">${it.num}</div><div class="stat-label-sm">${it.label}</div></div>`).join('')}</div>`;
-    slide.innerHTML = `
-      ${bodyHTML}
-      <div class="carousel-meta">
-        <span class="mono" style="font-size:11px; color:var(--faint);">0${idx+1} / 0${carouselData.length}</span>
-        <span class="mono" style="font-size:11px; color:var(--teal);">${s.project}</span>
-      </div>
-      <div class="proj-desc" style="margin-top:10px;">${s.caption}</div>
-    `;
+    slide.innerHTML = `${bodyHTML}
+      <div class="carousel-meta"><span class="mono" style="font-size:11px; color:var(--faint);">0${idx+1} / 0${carouselData.length}</span><span class="mono" style="font-size:11px; color:var(--teal);">${s.project}</span></div>
+      <div class="proj-desc" style="margin-top:10px;">${s.caption}</div>`;
     track.appendChild(slide);
-
     const dot = document.createElement('div');
     dot.className = 'dot' + (idx===0 ? ' active' : '');
     dot.tabIndex = 0;
@@ -728,28 +712,20 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     dot.addEventListener('keydown', (e) => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goTo(idx); } });
     dotsWrap.appendChild(dot);
   });
-
   setTimeout(() => {
     carouselData.forEach((s, idx) => {
       if(s.type !== 'bar') return;
       const ctx = document.getElementById(`car-chart-${idx}`);
       if(ctx && window.Chart){
-        new Chart(ctx, {
-          type:'bar',
+        new Chart(ctx, { type:'bar',
           data:{ labels:s.labels, datasets:[{ data:s.data, backgroundColor:s.colors, borderRadius:6, maxBarThickness:56 }] },
-          options:{
-            indexAxis:'y', responsive:true, maintainAspectRatio:false,
+          options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
             plugins:{ legend:{ display:false } },
-            scales:{
-              x:{ ticks:{ color:'#9BA0A6', font:{ family:'JetBrains Mono', size:10 } }, grid:{ color:'rgba(255,255,255,0.06)' } },
-              y:{ ticks:{ color:'#EDEBE6', font:{ family:'Inter', size:11 } }, grid:{ display:false } }
-            }
-          }
-        });
+            scales:{ x:{ ticks:{ color:'#9BA0A6', font:{ family:'JetBrains Mono', size:10 } }, grid:{ color:'rgba(255,255,255,0.06)' } },
+              y:{ ticks:{ color:'#EDEBE6', font:{ family:'Inter', size:11 } }, grid:{ display:false } } } } });
       }
     });
   }, 300);
-
   function goTo(i){
     carIndex = (i + carouselData.length) % carouselData.length;
     track.style.transform = `translateX(-${carIndex*100}%)`;
@@ -759,33 +735,22 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   document.getElementById('carNext').addEventListener('click', () => goTo(carIndex+1));
 })();
 
-/* ============================================================
-   TIMELINE
-   ============================================================ */
+/* TIMELINE */
 (function initTimeline(){
   const list = document.getElementById('timeline-list');
   if(!list) return;
   timelineData.forEach(t => {
     const item = document.createElement('div');
     item.className = 'tl-item reveal';
-    item.innerHTML = `
-      <div class="tl-dot"></div>
-      <div class="tl-year">${t.phase}</div>
-      <div class="tl-title">${t.title}</div>
-      <div class="tl-desc">${t.desc}</div>
-    `;
+    item.innerHTML = `<div class="tl-dot"></div><div class="tl-year">${t.phase}</div><div class="tl-title">${t.title}</div><div class="tl-desc">${t.desc}</div>`;
     list.appendChild(item);
   });
 })();
 
-/* ============================================================
-   NAV
-   ============================================================ */
+/* NAV */
 (function initNav(){
   const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
-  });
+  window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 40); });
   document.querySelectorAll('[data-target]').forEach(el => {
     el.addEventListener('click', () => {
       const target = document.getElementById(el.dataset.target);
@@ -794,9 +759,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   });
 })();
 
-/* ============================================================
-   HERO TICKER
-   ============================================================ */
+/* TICKER */
 (function initTicker(){
   const ticker = document.querySelector('.ticker');
   if(!ticker) return;
@@ -826,36 +789,256 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   obs.observe(ticker);
 })();
 
-/* ============================================================
-   CONTACT FORM — FormSubmit.co (FIXED)
-   ============================================================ */
+/* CONTACT */
 (function initContact() {
   const form = document.getElementById('contactForm');
   const btn = document.getElementById('submitBtn');
   if (!form || !btn) return;
-
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', function() {
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Sending...';
     btn.disabled = true;
-
-    // FormSubmit.co handles the rest automatically
-    // We just show feedback after submission
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }, 3000);
+    setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 3000);
   });
 })();
 
-/* ============================================================
-   SCROLL REVEAL
-   ============================================================ */
+/* SCROLL REVEAL */
 (function initReveal(){
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
   }, { threshold:0.12 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+})();
+
+/* ══════════════════════════════════════════════════════════
+   CLIENT PORTAL — Supabase Auth + Storage
+   ══════════════════════════════════════════════════════════ */
+(function initPortal(){
+  const authPanel   = document.getElementById('authPanel');
+  const dashboard   = document.getElementById('dashboard');
+  const authForm    = document.getElementById('authForm');
+  const authEmail   = document.getElementById('authEmail');
+  const authPass    = document.getElementById('authPass');
+  const authBtn     = document.getElementById('authBtn');
+  const authMsg     = document.getElementById('authMsg');
+  const logoutBtn   = document.getElementById('logoutBtn');
+  const userEmailEl = document.getElementById('userEmail');
+  const adminBadge  = document.getElementById('adminBadge');
+  const uploadZone  = document.getElementById('uploadZone');
+  const fileInput   = document.getElementById('fileInput');
+  const progWrap    = document.getElementById('uploadProgress');
+  const progFill    = document.getElementById('progressFill');
+  const progText    = document.getElementById('progressText');
+  const filesList   = document.getElementById('filesList');
+  const filesCount  = document.getElementById('filesCount');
+  const filesHeadText = document.getElementById('filesHeadText');
+
+  if(!authPanel || !window.supabase) return;
+
+  if(SUPABASE_ANON_KEY === 'PASTE_YOUR_ANON_KEY_HERE'){
+    authMsg.textContent = '⚠️ Supabase anon key not configured yet.';
+    authMsg.className = 'auth-msg error';
+    return;
+  }
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let currentUser = null;
+  let isAdmin = false;
+  let authMode = 'login';
+
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      authMode = tab.dataset.auth;
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
+      authBtn.innerHTML = (authMode === 'login' ? 'Login' : 'Create Account') + ' →';
+      authMsg.textContent = '';
+    });
+  });
+
+  function setMsg(text, type=''){
+    authMsg.textContent = text;
+    authMsg.className = 'auth-msg ' + type;
+  }
+
+  function formatBytes(b){
+    if(!b && b !== 0) return '';
+    if(b < 1024) return b + ' B';
+    if(b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+    return (b/1024/1024).toFixed(2) + ' MB';
+  }
+
+  function fileIconSvg(name){
+    return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  }
+
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setMsg('');
+    authBtn.disabled = true;
+    const old = authBtn.innerHTML;
+    authBtn.textContent = authMode === 'login' ? 'Logging in…' : 'Creating…';
+
+    try {
+      if(authMode === 'login'){
+        const { error } = await sb.auth.signInWithPassword({ email: authEmail.value.trim(), password: authPass.value });
+        if(error) throw error;
+      } else {
+        const { error } = await sb.auth.signUp({ email: authEmail.value.trim(), password: authPass.value });
+        if(error) throw error;
+        setMsg('✓ Account created. Check email if confirmation is required.', 'success');
+      }
+    } catch(err){
+      setMsg('✗ ' + (err.message || 'Something went wrong'), 'error');
+    } finally {
+      authBtn.disabled = false;
+      authBtn.innerHTML = old;
+    }
+  });
+
+  logoutBtn.addEventListener('click', async () => {
+    await sb.auth.signOut();
+  });
+
+  async function refreshUI(session){
+    if(!session || !session.user){
+      currentUser = null;
+      isAdmin = false;
+      authPanel.style.display = '';
+      dashboard.style.display = 'none';
+      return;
+    }
+    currentUser = session.user;
+    isAdmin = (currentUser.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+    authPanel.style.display = 'none';
+    dashboard.style.display = '';
+    userEmailEl.textContent = currentUser.email;
+    adminBadge.style.display = isAdmin ? '' : 'none';
+    filesHeadText.textContent = isAdmin ? 'ALL CLIENT FILES' : 'YOUR FILES';
+
+    await listFiles();
+  }
+
+  sb.auth.onAuthStateChange((_event, session) => { refreshUI(session); });
+  sb.auth.getSession().then(({ data }) => refreshUI(data.session));
+
+  async function listFiles(){
+    if(!currentUser) return;
+    filesList.innerHTML = '<div class="empty-state">Loading files…</div>';
+
+    let query = sb.storage.from(BUCKET).list(
+      isAdmin ? '' : currentUser.id,
+      { limit: 100, sortBy: { column: 'created_at', order: 'desc' } }
+    );
+    let { data, error } = await query;
+
+    if(isAdmin){
+      const { data: folders, error: fErr } = await sb.storage.from(BUCKET).list('', { limit: 100 });
+      if(fErr){ filesList.innerHTML = `<div class="empty-state">Error: ${fErr.message}</div>`; return; }
+      const allFiles = [];
+      for(const folder of (folders || [])){
+        if(!folder.name || folder.id) continue;
+        const { data: inner } = await sb.storage.from(BUCKET).list(folder.name, { limit: 100, sortBy: { column:'created_at', order:'desc' } });
+        (inner || []).forEach(f => { if(f.id) allFiles.push({ ...f, _folder: folder.name }); });
+      }
+      data = allFiles;
+      error = null;
+    }
+
+    if(error){
+      filesList.innerHTML = `<div class="empty-state">Error: ${error.message}</div>`;
+      return;
+    }
+    const files = (data || []).filter(f => f.id);
+    filesCount.textContent = files.length + (files.length === 1 ? ' file' : ' files');
+
+    if(files.length === 0){
+      filesList.innerHTML = '<div class="empty-state">No files yet — upload your first one above.</div>';
+      return;
+    }
+
+    filesList.innerHTML = '';
+    files.forEach(f => {
+      const folder = isAdmin ? f._folder : currentUser.id;
+      const path = `${folder}/${f.name}`;
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `
+        <div class="file-icon">${fileIconSvg(f.name)}</div>
+        <div class="file-info">
+          <div class="file-name">${f.name}</div>
+          <div class="file-meta">${formatBytes(f.metadata?.size)}${isAdmin ? ' · ' + folder.slice(0,8) + '…' : ''}</div>
+        </div>
+        <div class="file-actions">
+          <button class="icon-btn" data-act="download" title="Download">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="icon-btn danger" data-act="delete" title="Delete">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>`;
+      item.querySelector('[data-act="download"]').addEventListener('click', () => downloadFile(path));
+      item.querySelector('[data-act="delete"]').addEventListener('click', () => deleteFile(path, f.name));
+      filesList.appendChild(item);
+    });
+  }
+
+  async function downloadFile(path){
+    const { data, error } = await sb.storage.from(BUCKET).createSignedUrl(path, 60);
+    if(error || !data){ alert('Download failed: ' + (error?.message || 'unknown')); return; }
+    window.open(data.signedUrl, '_blank');
+  }
+
+  async function deleteFile(path, name){
+    if(!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    const { error } = await sb.storage.from(BUCKET).remove([path]);
+    if(error){ alert('Delete failed: ' + error.message); return; }
+    await listFiles();
+  }
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+  ['dragenter','dragover'].forEach(evt => uploadZone.addEventListener(evt, (e) => { e.preventDefault(); uploadZone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(evt => uploadZone.addEventListener(evt, (e) => { e.preventDefault(); uploadZone.classList.remove('drag'); }));
+  uploadZone.addEventListener('drop', (e) => { if(e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', () => { if(fileInput.files.length) uploadFile(fileInput.files[0]); fileInput.value = ''; });
+
+  async function uploadFile(file){
+    if(!currentUser) return;
+    if(file.size > 5 * 1024 * 1024){ alert('File too large. Max 5 MB allowed.'); return; }
+    const okTypes = ['image/jpeg','image/png','image/webp'];
+    if(!okTypes.includes(file.type)){ alert('Only JPG, PNG, or WEBP allowed.'); return; }
+
+    const safeName = file.name.replace(/[^\w.\-]+/g, '_');
+    const path = `${currentUser.id}/${Date.now()}_${safeName}`;
+
+    progWrap.style.display = '';
+    progFill.style.width = '0%';
+    progText.textContent = 'Uploading…';
+
+    let pct = 0;
+    const timer = setInterval(() => {
+      pct = Math.min(pct + 8, 90);
+      progFill.style.width = pct + '%';
+    }, 120);
+
+    const { error } = await sb.storage.from(BUCKET).upload(path, file, {
+      cacheControl: '3600', upsert: false, contentType: file.type
+    });
+    clearInterval(timer);
+
+    if(error){
+      progFill.style.width = '100%';
+      progFill.style.background = 'linear-gradient(90deg,#E8615A,#F2A93B)';
+      progText.textContent = '✗ ' + error.message;
+      setTimeout(() => { progWrap.style.display = 'none'; progFill.style.background = ''; }, 3000);
+      return;
+    }
+    progFill.style.width = '100%';
+    progText.textContent = '✓ Uploaded';
+    setTimeout(() => { progWrap.style.display = 'none'; progFill.style.width = '0%'; }, 1200);
+
+    await listFiles();
+  }
 })();
 </script>
 </body>
