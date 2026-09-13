@@ -207,6 +207,12 @@
   .empty-state{ text-align:center; padding:34px; color:var(--faint); font-family:'JetBrains Mono',monospace; font-size:12px; border:1px dashed var(--line); border-radius:12px; }
   .admin-badge{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:6px; background:rgba(79,209,197,0.12); border:1px solid rgba(79,209,197,0.3); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--teal); letter-spacing:.5px; }
 
+  .admin-upload-row{ display:none; margin-bottom:16px; padding:16px 18px; background:rgba(79,209,197,0.06); border:1px solid rgba(79,209,197,0.25); border-radius:12px; text-align:left; }
+  .admin-upload-row label{ display:block; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--teal); letter-spacing:1.5px; margin-bottom:10px; }
+  .admin-upload-row select{ width:100%; background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:11px 12px; color:var(--text); font-family:'Inter',sans-serif; font-size:13.5px; cursor:pointer; transition:border-color .2s; }
+  .admin-upload-row select:focus{ outline:none; border-color:var(--teal); }
+  .from-admin-badge{ display:inline-flex; align-items:center; padding:2px 6px; border-radius:4px; background:rgba(79,209,197,0.15); border:1px solid rgba(79,209,197,0.35); font-family:'JetBrains Mono',monospace; font-size:8.5px; color:var(--teal); letter-spacing:.5px; margin-left:8px; vertical-align:middle; font-weight:600; }
+
   /* CONTACT */
   .contact-form{ display:grid; gap:14px; text-align:left; max-width:720px; margin:0 auto; }
   .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -415,11 +421,18 @@
         <button class="btn btn-outline" id="logoutBtn" style="padding:9px 16px; font-size:13px;">Logout</button>
       </div>
 
+      <div id="adminUploadRow" class="admin-upload-row">
+        <label>📤 SEND FILE TO A CLIENT</label>
+        <select id="clientSelect">
+          <option value="">-- Loading clients… --</option>
+        </select>
+      </div>
+
       <div id="uploadZone" class="upload-zone">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <div class="drop-text">Drag &amp; drop or <span>browse</span></div>
-        <div class="drop-hint">JPG · PNG · WEBP — max 5 MB</div>
-        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden />
+        <div class="drop-hint">JPG · PNG · WEBP · PDF · CSV · XLS · XLSX — max 15 MB</div>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.pdf,.csv,.xls,.xlsx,image/jpeg,image/png,image/webp,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
       </div>
 
       <div id="uploadProgress" class="upload-progress" style="display:none;">
@@ -476,7 +489,7 @@
 /* ══════════════════════════════════════════════════════════
    CONFIG — Supabase
    ══════════════════════════════════════════════════════════ */
-const SUPABASE_URL = 'https://mwbpdpwjplbdhzqvxtglo.supabase.co';
+const SUPABASE_URL = 'https://mwbpdwpjlbdhzqvxtglo.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13YnBkd3BqbGJkaHpxdnh0Z2xvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxOTIyMDUsImV4cCI6MjEwNDc2ODIwNX0.PzbDj00e-1El0nnkW2-fAYMtz_thxD8PZoX9Aopcmxw';
 const ADMIN_EMAIL = 'avneesh.codes@gmail.com';
 const BUCKET = 'client-files';
@@ -832,6 +845,8 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   const filesList   = document.getElementById('filesList');
   const filesCount  = document.getElementById('filesCount');
   const filesHeadText = document.getElementById('filesHeadText');
+  const adminUploadRow = document.getElementById('adminUploadRow');
+  const clientSelect = document.getElementById('clientSelect');
 
   if(!authPanel || !window.supabase) return;
 
@@ -868,6 +883,16 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   }
 
   function fileIconSvg(name){
+    const ext = (name.split('.').pop() || '').toLowerCase();
+    if(['jpg','jpeg','png','webp'].includes(ext)){
+      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+    }
+    if(ext === 'pdf'){
+      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h1.5a1.5 1.5 0 000-3H9v6"/><line x1="15" y1="12" x2="15" y2="18"/></svg>`;
+    }
+    if(['csv','xls','xlsx'].includes(ext)){
+      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="12" y1="13" x2="12" y2="17"/></svg>`;
+    }
     return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
   }
 
@@ -915,8 +940,32 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     userEmailEl.textContent = currentUser.email;
     adminBadge.style.display = isAdmin ? '' : 'none';
     filesHeadText.textContent = isAdmin ? 'ALL CLIENT FILES' : 'YOUR FILES';
+    adminUploadRow.style.display = isAdmin ? 'block' : 'none';
 
+    if(isAdmin) await loadClientList();
     await listFiles();
+  }
+
+  /* ⬇️ UPDATED — Ab client ka email dikhega UUID ki jagah */
+  async function loadClientList(){
+    const { data: folders } = await sb.storage.from(BUCKET).list('', { limit: 100 });
+    const clientFolders = (folders || []).filter(f => !f.id && f.name);
+    if(clientFolders.length === 0){
+      clientSelect.innerHTML = '<option value="">-- No clients yet --</option>';
+      return;
+    }
+    // Saare profiles fetch karo (simpler + reliable)
+    const { data: profiles } = await sb.from('profiles').select('id, email');
+    const emailMap = {};
+    (profiles || []).forEach(p => { emailMap[p.id] = p.email; });
+
+    const current = clientSelect.value;
+    clientSelect.innerHTML = '<option value="">-- Select a client --</option>' +
+      clientFolders.map(f => {
+        const email = emailMap[f.name] || `Client ${f.name.slice(0,8)}…${f.name.slice(-4)}`;
+        return `<option value="${f.name}">${email}</option>`;
+      }).join('');
+    if(current) clientSelect.value = current;
   }
 
   sb.auth.onAuthStateChange((_event, session) => { refreshUI(session); });
@@ -963,10 +1012,12 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
       const path = `${folder}/${f.name}`;
       const item = document.createElement('div');
       item.className = 'file-item';
+      const isFromAdmin = f.name.startsWith('admin_');
+      const displayName = isFromAdmin ? f.name.substring(6) : f.name;
       item.innerHTML = `
         <div class="file-icon">${fileIconSvg(f.name)}</div>
         <div class="file-info">
-          <div class="file-name">${f.name}</div>
+          <div class="file-name">${displayName}${isFromAdmin ? '<span class="from-admin-badge">FROM ADMIN</span>' : ''}</div>
           <div class="file-meta">${formatBytes(f.metadata?.size)}${isAdmin ? ' · ' + folder.slice(0,8) + '…' : ''}</div>
         </div>
         <div class="file-actions">
@@ -978,7 +1029,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
           </button>
         </div>`;
       item.querySelector('[data-act="download"]').addEventListener('click', () => downloadFile(path));
-      item.querySelector('[data-act="delete"]').addEventListener('click', () => deleteFile(path, f.name));
+      item.querySelector('[data-act="delete"]').addEventListener('click', () => deleteFile(path, displayName));
       filesList.appendChild(item);
     });
   }
@@ -1004,12 +1055,34 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
   async function uploadFile(file){
     if(!currentUser) return;
-    if(file.size > 5 * 1024 * 1024){ alert('File too large. Max 5 MB allowed.'); return; }
-    const okTypes = ['image/jpeg','image/png','image/webp'];
-    if(!okTypes.includes(file.type)){ alert('Only JPG, PNG, or WEBP allowed.'); return; }
+
+    let targetFolder;
+    let isAdminUpload = false;
+
+    if(isAdmin){
+      targetFolder = clientSelect.value;
+      if(!targetFolder){
+        alert('Please select a client from the dropdown above to send this file to.');
+        return;
+      }
+      isAdminUpload = true;
+    } else {
+      targetFolder = currentUser.id;
+    }
+
+    if(file.size > 15 * 1024 * 1024){ alert('File too large. Max 15 MB allowed.'); return; }
+    const okTypes = [
+      'image/jpeg','image/png','image/webp',
+      'application/pdf',
+      'text/csv',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    if(!okTypes.includes(file.type)){ alert('Only JPG, PNG, WEBP, PDF, CSV, XLS, XLSX files are allowed.'); return; }
 
     const safeName = file.name.replace(/[^\w.\-]+/g, '_');
-    const path = `${currentUser.id}/${Date.now()}_${safeName}`;
+    const prefix = isAdminUpload ? 'admin_' : '';
+    const path = `${targetFolder}/${prefix}${Date.now()}_${safeName}`;
 
     progWrap.style.display = '';
     progFill.style.width = '0%';
@@ -1034,10 +1107,11 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
       return;
     }
     progFill.style.width = '100%';
-    progText.textContent = '✓ Uploaded';
+    progText.textContent = isAdminUpload ? '✓ Sent to client' : '✓ Uploaded';
     setTimeout(() => { progWrap.style.display = 'none'; progFill.style.width = '0%'; }, 1200);
 
     await listFiles();
+    if(isAdmin) await loadClientList();
   }
 })();
 </script>
