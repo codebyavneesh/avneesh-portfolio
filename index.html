@@ -213,7 +213,7 @@
   .admin-upload-row select:focus{ outline:none; border-color:var(--teal); }
   .from-admin-badge{ display:inline-flex; align-items:center; padding:2px 6px; border-radius:4px; background:rgba(79,209,197,0.15); border:1px solid rgba(79,209,197,0.35); font-family:'JetBrains Mono',monospace; font-size:8.5px; color:var(--teal); letter-spacing:.5px; margin-left:8px; vertical-align:middle; font-weight:600; }
 
-  /* ⬇️ NEW — Project details card */
+  /* Project details card */
   .project-card{ display:none; margin-bottom:16px; padding:20px 22px; background:rgba(242,169,59,0.05); border:1px solid rgba(242,169,59,0.22); border-radius:12px; text-align:left; }
   .project-card .pc-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; flex-wrap:wrap; }
   .project-card .pc-title{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--amber); letter-spacing:1.5px; }
@@ -269,167 +269,57 @@
 
   /* ═══ MOBILE RESPONSIVE FIXES ═══ */
   @media (max-width: 640px){
-    /* Global padding */
     .section{ padding:70px 16px; }
     .wrap{ padding-left:16px; padding-right:16px; }
     nav{ padding:14px 16px; }
     body{ overflow-x:hidden; }
-
-    /* Portal container */
     .portal-wrap{ margin:30px 12px 0; }
     .auth-panel, .dashboard{ padding:20px 16px; border-radius:14px; }
-
-    /* Dashboard header */
-    .dash-head{
-      flex-direction:column;
-      align-items:stretch;
-      gap:12px;
-      padding-bottom:16px;
-      margin-bottom:18px;
-    }
-    #logoutBtn{
-      width:100%;
-      justify-content:center;
-      padding:11px !important;
-    }
-
-    /* Admin dropdown */
+    .dash-head{ flex-direction:column; align-items:stretch; gap:12px; padding-bottom:16px; margin-bottom:18px; }
+    #logoutBtn{ width:100%; justify-content:center; padding:11px !important; }
     .admin-upload-row{ padding:14px; margin-bottom:14px; }
     .admin-upload-row label{ font-size:9.5px; margin-bottom:8px; }
     .admin-upload-row select{ font-size:13px; padding:10px 11px; }
-
-    /* Project card */
     .project-card{ padding:16px; margin-bottom:14px; }
-    .project-card .pc-head{
-      flex-direction:column;
-      align-items:flex-start;
-      gap:8px;
-      margin-bottom:12px;
-    }
+    .project-card .pc-head{ flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:12px; }
     .project-card .pc-title{ font-size:9.5px; }
     .project-card .pc-field label{ font-size:9px; }
-    .project-card .pc-field input,
-    .project-card .pc-field select,
-    .project-card .pc-field textarea{
-      font-size:13px;
-      padding:10px 11px;
-    }
+    .project-card .pc-field input, .project-card .pc-field select, .project-card .pc-field textarea{ font-size:13px; padding:10px 11px; }
     .project-card .pc-summary{ gap:12px; }
-    .project-card .pc-summary-row{
-      flex-direction:column;
-      gap:3px;
-      padding-bottom:10px;
-      border-bottom:1px solid var(--line);
-    }
+    .project-card .pc-summary-row{ flex-direction:column; gap:3px; padding-bottom:10px; border-bottom:1px solid var(--line); }
     .project-card .pc-summary-row:last-child{ border-bottom:none; padding-bottom:0; }
-    .project-card .pc-summary-row .k{
-      min-width:auto;
-      padding-top:0;
-      font-size:9px;
-    }
+    .project-card .pc-summary-row .k{ min-width:auto; padding-top:0; font-size:9px; }
     .project-card .pc-summary-row .v{ font-size:13px; }
-    .project-card .pc-actions{
-      flex-direction:column;
-      margin-top:10px;
-    }
-    .project-card .pc-actions .btn{
-      width:100%;
-      justify-content:center;
-    }
-
-    /* Upload zone */
+    .project-card .pc-actions{ flex-direction:column; margin-top:10px; }
+    .project-card .pc-actions .btn{ width:100%; justify-content:center; }
     .upload-zone{ padding:28px 14px; }
     .upload-zone svg{ width:28px; height:28px; margin-bottom:10px; }
     .drop-text{ font-size:14.5px; margin-bottom:5px; }
     .drop-hint{ font-size:9.5px; line-height:1.4; }
-
-    /* Files head */
-    .files-head{
-      margin:22px 0 12px;
-      flex-wrap:wrap;
-      gap:6px;
-    }
+    .files-head{ margin:22px 0 12px; flex-wrap:wrap; gap:6px; }
     .files-head .kicker{ font-size:11px; }
     .files-head .mono{ font-size:10px; }
-
-    /* ═══ FILE ITEMS — MAIN FIX ═══ */
-    .file-item{
-      display:grid;
-      grid-template-columns:auto 1fr;
-      grid-template-rows:auto auto;
-      gap:8px 12px;
-      padding:14px;
-      align-items:flex-start;
-    }
-    .file-icon{
-      grid-column:1;
-      grid-row:1;
-      width:36px;
-      height:36px;
-      border-radius:8px;
-    }
+    .file-item{ display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; gap:8px 12px; padding:14px; align-items:flex-start; }
+    .file-icon{ grid-column:1; grid-row:1; width:36px; height:36px; border-radius:8px; }
     .file-icon svg{ width:16px; height:16px; }
-    .file-info{
-      grid-column:2;
-      grid-row:1;
-      min-width:0;
-    }
-    .file-name{
-      font-size:13px;
-      white-space:normal;
-      overflow:visible;
-      text-overflow:clip;
-      word-break:break-word;
-      line-height:1.4;
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      gap:6px;
-    }
-    .file-meta{
-      font-size:10px;
-      margin-top:4px;
-    }
-    .file-actions{
-      grid-column:1 / -1;
-      grid-row:2;
-      justify-content:flex-end;
-      gap:10px;
-      padding-top:10px;
-      border-top:1px solid var(--line);
-      margin-top:2px;
-    }
-    .icon-btn{
-      width:38px;
-      height:38px;
-      border-radius:9px;
-    }
+    .file-info{ grid-column:2; grid-row:1; min-width:0; }
+    .file-name{ font-size:13px; white-space:normal; overflow:visible; text-overflow:clip; word-break:break-word; line-height:1.4; display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+    .file-meta{ font-size:10px; margin-top:4px; }
+    .file-actions{ grid-column:1 / -1; grid-row:2; justify-content:flex-end; gap:10px; padding-top:10px; border-top:1px solid var(--line); margin-top:2px; }
+    .icon-btn{ width:38px; height:38px; border-radius:9px; }
     .icon-btn svg{ width:16px; height:16px; }
-    .from-admin-badge{
-      font-size:8px;
-      padding:2px 6px;
-      margin-left:0;
-    }
-
-    /* Auth panels */
+    .from-admin-badge{ font-size:8px; padding:2px 6px; margin-left:0; }
     .auth-tabs{ margin-bottom:18px; }
     .auth-tab{ padding:10px; font-size:13px; }
     .auth-panel form{ gap:10px; }
     .auth-panel input{ font-size:14px; padding:11px 12px; }
     .auth-msg{ font-size:12px; }
-
-    /* Reset panel */
     #resetPanel h3{ font-size:17px; }
-
-    /* Progress bar */
     .progress-bar{ height:5px; }
-
-    /* General buttons */
     .btn{ padding:11px 18px; font-size:14px; }
     .btn-outline{ padding:10px 14px; font-size:12.5px; }
   }
 
-  /* Extra small screens */
   @media (max-width: 400px){
     .portal-wrap{ margin:24px 10px 0; }
     .auth-panel, .dashboard{ padding:16px 14px; }
@@ -468,7 +358,7 @@
       </p>
       <div class="btn-row">
         <button class="btn btn-primary" data-target="work">View My Work ↗</button>
-        <button class="btn btn-outline" data-target="portal">Client Portal</button>
+        <button class="btn btn-outline" data-target="portal">Client Workspace</button>
       </div>
       <div class="ticker">
         <div class="ticker-item">
@@ -581,10 +471,10 @@
 <!-- ═══════════════ CLIENT PORTAL ═══════════════ -->
 <section id="portal" class="section grid-bg" style="text-align:center;">
   <div class="reveal" style="max-width:720px; margin:0 auto;">
-    <div class="kicker">CLIENT PORTAL</div>
-    <h2 class="h2">Your files. Securely yours.</h2>
+    <div class="kicker">CLIENT WORKSPACE</div>
+    <h2 class="h2">Your project, managed end-to-end.</h2>
     <p style="color:var(--dim); max-width:560px; margin:0 auto; line-height:1.7;">
-      Login to upload project files — Excel, CSV, PDF, or images. Files are stored privately, and only you (and I) can access them.
+      Upload your data, share your requirements, and track every file I send back — all from one secure dashboard.
     </p>
   </div>
 
@@ -639,7 +529,6 @@
         </select>
       </div>
 
-      <!-- ⬇️ NEW — PROJECT DETAILS CARD -->
       <div id="projectCard" class="project-card">
         <div class="pc-head">
           <div class="pc-title" id="pcTitle">📋 PROJECT DETAILS</div>
@@ -675,9 +564,9 @@
 <!-- CONTACT -->
 <section id="contact" class="section" style="text-align:center;">
   <div class="reveal" style="max-width:720px; margin:0 auto;">
-    <div class="kicker">CONTACT</div>
-    <h2 class="h2">Have a dataset worth exploring?</h2>
-    <p style="color:var(--dim); margin-bottom:40px;">Send a message — I read every one.</p>
+    <div class="kicker">GET IN TOUCH</div>
+    <h2 class="h2">Got a project in mind? Let's talk.</h2>
+    <p style="color:var(--dim); margin-bottom:40px; max-width:540px; margin-left:auto; margin-right:auto;">New client or just exploring — drop a message below. If we're a good fit, I'll set up your client workspace.</p>
   </div>
   <form class="reveal contact-form" action="https://formsubmit.co/avneesh.codes@gmail.com" method="POST" id="contactForm">
     <input type="hidden" name="_captcha" value="false">
@@ -687,7 +576,7 @@
       <input required type="text" name="name" placeholder="Your Name" id="fName"/>
       <input required type="email" name="email" placeholder="Your Email" id="fEmail"/>
     </div>
-    <textarea required rows="4" name="message" placeholder="What are you working on?" id="fMessage"></textarea>
+    <textarea required rows="4" name="message" placeholder="Tell me about your project — what do you need help with?" id="fMessage"></textarea>
     <button type="submit" class="btn btn-primary" style="justify-content:center;" id="submitBtn">
       Send Message
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -1077,7 +966,6 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   const newPass = document.getElementById('newPass');
   const newPass2 = document.getElementById('newPass2');
   const resetMsg = document.getElementById('resetMsg');
-  /* ⬇️ NEW — project card refs */
   const projectCard = document.getElementById('projectCard');
   const pcTitle = document.getElementById('pcTitle');
   const pcStatusWrap = document.getElementById('pcStatusWrap');
@@ -1448,7 +1336,6 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     });
   }
 
-  // Admin dropdown change → reload that client's project
   clientSelect.addEventListener('change', () => {
     if(isAdmin) renderAdminProjectView();
   });
