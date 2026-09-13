@@ -213,6 +213,28 @@
   .admin-upload-row select:focus{ outline:none; border-color:var(--teal); }
   .from-admin-badge{ display:inline-flex; align-items:center; padding:2px 6px; border-radius:4px; background:rgba(79,209,197,0.15); border:1px solid rgba(79,209,197,0.35); font-family:'JetBrains Mono',monospace; font-size:8.5px; color:var(--teal); letter-spacing:.5px; margin-left:8px; vertical-align:middle; font-weight:600; }
 
+  /* ⬇️ NEW — Project details card */
+  .project-card{ display:none; margin-bottom:16px; padding:20px 22px; background:rgba(242,169,59,0.05); border:1px solid rgba(242,169,59,0.22); border-radius:12px; text-align:left; }
+  .project-card .pc-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; flex-wrap:wrap; }
+  .project-card .pc-title{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--amber); letter-spacing:1.5px; }
+  .project-card .pc-status{ padding:3px 9px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; font-weight:600; }
+  .project-card .pc-status[data-status="new"]{ background:rgba(242,169,59,0.15); color:var(--amber); border:1px solid rgba(242,169,59,0.3); }
+  .project-card .pc-status[data-status="contacted"]{ background:rgba(79,209,197,0.15); color:var(--teal); border:1px solid rgba(79,209,197,0.3); }
+  .project-card .pc-status[data-status="quoted"]{ background:rgba(242,169,59,0.2); color:#F2A93B; border:1px solid rgba(242,169,59,0.4); }
+  .project-card .pc-status[data-status="in_progress"]{ background:rgba(79,209,197,0.2); color:#4FD1C5; border:1px solid rgba(79,209,197,0.4); }
+  .project-card .pc-status[data-status="completed"]{ background:rgba(79,209,197,0.25); color:#4FD1C5; border:1px solid rgba(79,209,197,0.5); }
+  .project-card form{ display:grid; gap:10px; }
+  .project-card .pc-field label{ display:block; font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--faint); letter-spacing:1px; margin-bottom:5px; }
+  .project-card .pc-field input, .project-card .pc-field select, .project-card .pc-field textarea{ background:var(--bg2); border:1px solid var(--line); border-radius:7px; padding:10px 12px; color:var(--text); font-size:13px; font-family:'Inter',sans-serif; width:100%; transition:border-color .2s; }
+  .project-card .pc-field input:focus, .project-card .pc-field select:focus, .project-card .pc-field textarea:focus{ outline:none; border-color:var(--amber); }
+  .project-card .pc-field textarea{ resize:vertical; min-height:70px; font-family:'Inter',sans-serif; }
+  .project-card .pc-actions{ display:flex; gap:10px; margin-top:6px; }
+  .project-card .pc-summary{ display:grid; gap:10px; }
+  .project-card .pc-summary-row{ display:flex; gap:12px; font-size:13.5px; }
+  .project-card .pc-summary-row .k{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--faint); min-width:95px; padding-top:3px; letter-spacing:.5px; }
+  .project-card .pc-summary-row .v{ color:var(--text); flex:1; line-height:1.5; }
+  .pc-empty{ color:var(--faint); font-family:'JetBrains Mono',monospace; font-size:11.5px; padding:8px 0; }
+
   /* CONTACT */
   .contact-form{ display:grid; gap:14px; text-align:left; max-width:720px; margin:0 auto; }
   .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -243,6 +265,180 @@
   @media (max-width:560px){
     .project-grid{ grid-template-columns:1fr !important; }
     .auth-panel, .dashboard{ padding:22px; }
+  }
+
+  /* ═══ MOBILE RESPONSIVE FIXES ═══ */
+  @media (max-width: 640px){
+    /* Global padding */
+    .section{ padding:70px 16px; }
+    .wrap{ padding-left:16px; padding-right:16px; }
+    nav{ padding:14px 16px; }
+    body{ overflow-x:hidden; }
+
+    /* Portal container */
+    .portal-wrap{ margin:30px 12px 0; }
+    .auth-panel, .dashboard{ padding:20px 16px; border-radius:14px; }
+
+    /* Dashboard header */
+    .dash-head{
+      flex-direction:column;
+      align-items:stretch;
+      gap:12px;
+      padding-bottom:16px;
+      margin-bottom:18px;
+    }
+    #logoutBtn{
+      width:100%;
+      justify-content:center;
+      padding:11px !important;
+    }
+
+    /* Admin dropdown */
+    .admin-upload-row{ padding:14px; margin-bottom:14px; }
+    .admin-upload-row label{ font-size:9.5px; margin-bottom:8px; }
+    .admin-upload-row select{ font-size:13px; padding:10px 11px; }
+
+    /* Project card */
+    .project-card{ padding:16px; margin-bottom:14px; }
+    .project-card .pc-head{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .project-card .pc-title{ font-size:9.5px; }
+    .project-card .pc-field label{ font-size:9px; }
+    .project-card .pc-field input,
+    .project-card .pc-field select,
+    .project-card .pc-field textarea{
+      font-size:13px;
+      padding:10px 11px;
+    }
+    .project-card .pc-summary{ gap:12px; }
+    .project-card .pc-summary-row{
+      flex-direction:column;
+      gap:3px;
+      padding-bottom:10px;
+      border-bottom:1px solid var(--line);
+    }
+    .project-card .pc-summary-row:last-child{ border-bottom:none; padding-bottom:0; }
+    .project-card .pc-summary-row .k{
+      min-width:auto;
+      padding-top:0;
+      font-size:9px;
+    }
+    .project-card .pc-summary-row .v{ font-size:13px; }
+    .project-card .pc-actions{
+      flex-direction:column;
+      margin-top:10px;
+    }
+    .project-card .pc-actions .btn{
+      width:100%;
+      justify-content:center;
+    }
+
+    /* Upload zone */
+    .upload-zone{ padding:28px 14px; }
+    .upload-zone svg{ width:28px; height:28px; margin-bottom:10px; }
+    .drop-text{ font-size:14.5px; margin-bottom:5px; }
+    .drop-hint{ font-size:9.5px; line-height:1.4; }
+
+    /* Files head */
+    .files-head{
+      margin:22px 0 12px;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .files-head .kicker{ font-size:11px; }
+    .files-head .mono{ font-size:10px; }
+
+    /* ═══ FILE ITEMS — MAIN FIX ═══ */
+    .file-item{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      grid-template-rows:auto auto;
+      gap:8px 12px;
+      padding:14px;
+      align-items:flex-start;
+    }
+    .file-icon{
+      grid-column:1;
+      grid-row:1;
+      width:36px;
+      height:36px;
+      border-radius:8px;
+    }
+    .file-icon svg{ width:16px; height:16px; }
+    .file-info{
+      grid-column:2;
+      grid-row:1;
+      min-width:0;
+    }
+    .file-name{
+      font-size:13px;
+      white-space:normal;
+      overflow:visible;
+      text-overflow:clip;
+      word-break:break-word;
+      line-height:1.4;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:6px;
+    }
+    .file-meta{
+      font-size:10px;
+      margin-top:4px;
+    }
+    .file-actions{
+      grid-column:1 / -1;
+      grid-row:2;
+      justify-content:flex-end;
+      gap:10px;
+      padding-top:10px;
+      border-top:1px solid var(--line);
+      margin-top:2px;
+    }
+    .icon-btn{
+      width:38px;
+      height:38px;
+      border-radius:9px;
+    }
+    .icon-btn svg{ width:16px; height:16px; }
+    .from-admin-badge{
+      font-size:8px;
+      padding:2px 6px;
+      margin-left:0;
+    }
+
+    /* Auth panels */
+    .auth-tabs{ margin-bottom:18px; }
+    .auth-tab{ padding:10px; font-size:13px; }
+    .auth-panel form{ gap:10px; }
+    .auth-panel input{ font-size:14px; padding:11px 12px; }
+    .auth-msg{ font-size:12px; }
+
+    /* Reset panel */
+    #resetPanel h3{ font-size:17px; }
+
+    /* Progress bar */
+    .progress-bar{ height:5px; }
+
+    /* General buttons */
+    .btn{ padding:11px 18px; font-size:14px; }
+    .btn-outline{ padding:10px 14px; font-size:12.5px; }
+  }
+
+  /* Extra small screens */
+  @media (max-width: 400px){
+    .portal-wrap{ margin:24px 10px 0; }
+    .auth-panel, .dashboard{ padding:16px 14px; }
+    .file-item{ padding:12px; gap:8px 10px; }
+    .file-name{ font-size:12.5px; }
+    .file-meta{ font-size:9.5px; }
+    .icon-btn{ width:36px; height:36px; }
+    .drop-text{ font-size:13.5px; }
+    .drop-hint{ font-size:9px; }
   }
 </style>
 </head>
@@ -401,11 +597,26 @@
         <button type="button" class="auth-tab" data-auth="signup">Sign Up</button>
       </div>
       <form id="authForm">
+        <input type="text" id="authName" placeholder="Your Name" style="display:none;" />
+        <input type="text" id="authBusiness" placeholder="Business Name (optional)" style="display:none;" />
         <input type="email" id="authEmail" placeholder="you@example.com" required autocomplete="email" />
         <input type="password" id="authPass" placeholder="Password (min 6 characters)" required minlength="6" autocomplete="current-password" />
         <button type="submit" class="btn btn-primary" id="authBtn" style="justify-content:center; width:100%;">Login →</button>
       </form>
       <div id="authMsg" class="auth-msg"></div>
+      <button type="button" id="forgotPassBtn" style="background:none; border:none; color:var(--dim); font-family:'JetBrains Mono',monospace; font-size:11px; margin-top:14px; cursor:pointer; text-decoration:underline; text-underline-offset:3px;">Forgot password?</button>
+    </div>
+
+    <!-- RESET PASSWORD PANEL (hidden by default) -->
+    <div id="resetPanel" class="auth-panel" style="display:none;">
+      <div class="kicker" style="text-align:center;">RESET PASSWORD</div>
+      <h3 class="display" style="font-size:19px; text-align:center; margin:10px 0 22px;">Set a new password</h3>
+      <form id="resetForm">
+        <input type="password" id="newPass" placeholder="New password (min 6 characters)" required minlength="6" />
+        <input type="password" id="newPass2" placeholder="Confirm new password" required minlength="6" />
+        <button type="submit" class="btn btn-primary" style="justify-content:center; width:100%;">Update Password →</button>
+      </form>
+      <div id="resetMsg" class="auth-msg"></div>
     </div>
 
     <!-- DASHBOARD -->
@@ -426,6 +637,17 @@
         <select id="clientSelect">
           <option value="">-- Loading clients… --</option>
         </select>
+      </div>
+
+      <!-- ⬇️ NEW — PROJECT DETAILS CARD -->
+      <div id="projectCard" class="project-card">
+        <div class="pc-head">
+          <div class="pc-title" id="pcTitle">📋 PROJECT DETAILS</div>
+          <div id="pcStatusWrap" style="display:none;">
+            <span id="pcStatus" class="pc-status" data-status="new">NEW</span>
+          </div>
+        </div>
+        <div id="pcBody"></div>
       </div>
 
       <div id="uploadZone" class="upload-zone">
@@ -847,6 +1069,20 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
   const filesHeadText = document.getElementById('filesHeadText');
   const adminUploadRow = document.getElementById('adminUploadRow');
   const clientSelect = document.getElementById('clientSelect');
+  const authName = document.getElementById('authName');
+  const authBusiness = document.getElementById('authBusiness');
+  const forgotPassBtn = document.getElementById('forgotPassBtn');
+  const resetPanel = document.getElementById('resetPanel');
+  const resetForm = document.getElementById('resetForm');
+  const newPass = document.getElementById('newPass');
+  const newPass2 = document.getElementById('newPass2');
+  const resetMsg = document.getElementById('resetMsg');
+  /* ⬇️ NEW — project card refs */
+  const projectCard = document.getElementById('projectCard');
+  const pcTitle = document.getElementById('pcTitle');
+  const pcStatusWrap = document.getElementById('pcStatusWrap');
+  const pcStatus = document.getElementById('pcStatus');
+  const pcBody = document.getElementById('pcBody');
 
   if(!authPanel || !window.supabase) return;
 
@@ -867,12 +1103,27 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
       document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
       authBtn.innerHTML = (authMode === 'login' ? 'Login' : 'Create Account') + ' →';
       authMsg.textContent = '';
+      const showExtra = authMode === 'signup';
+      authName.style.display = showExtra ? '' : 'none';
+      authBusiness.style.display = showExtra ? '' : 'none';
+      authName.required = showExtra;
     });
   });
 
   function setMsg(text, type=''){
     authMsg.textContent = text;
     authMsg.className = 'auth-msg ' + type;
+  }
+
+  function timeAgo(dateStr){
+    if(!dateStr) return '';
+    const d = new Date(dateStr);
+    const diff = (Date.now() - d.getTime()) / 1000;
+    if(diff < 60) return 'just now';
+    if(diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if(diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    if(diff < 2592000) return Math.floor(diff/86400) + 'd ago';
+    return d.toLocaleDateString();
   }
 
   function formatBytes(b){
@@ -908,7 +1159,16 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         const { error } = await sb.auth.signInWithPassword({ email: authEmail.value.trim(), password: authPass.value });
         if(error) throw error;
       } else {
-        const { error } = await sb.auth.signUp({ email: authEmail.value.trim(), password: authPass.value });
+        const { error } = await sb.auth.signUp({
+          email: authEmail.value.trim(),
+          password: authPass.value,
+          options: {
+            data: {
+              full_name: authName.value.trim(),
+              business_name: authBusiness.value.trim()
+            }
+          }
+        });
         if(error) throw error;
         setMsg('✓ Account created. Check email if confirmation is required.', 'success');
       }
@@ -922,6 +1182,43 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
   logoutBtn.addEventListener('click', async () => {
     await sb.auth.signOut();
+  });
+
+  forgotPassBtn.addEventListener('click', async () => {
+    const email = authEmail.value.trim() || prompt('Enter your email to receive a password reset link:');
+    if(!email){ return; }
+    setMsg('Sending reset link…');
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if(error){ setMsg('✗ ' + error.message, 'error'); return; }
+    setMsg('✓ Reset link sent to ' + email + '. Check your inbox.', 'success');
+  });
+
+  resetForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if(newPass.value !== newPass2.value){
+      resetMsg.textContent = '✗ Passwords do not match';
+      resetMsg.className = 'auth-msg error';
+      return;
+    }
+    resetMsg.textContent = 'Updating…';
+    resetMsg.className = 'auth-msg';
+    const { error } = await sb.auth.updateUser({ password: newPass.value });
+    if(error){
+      resetMsg.textContent = '✗ ' + error.message;
+      resetMsg.className = 'auth-msg error';
+      return;
+    }
+    resetMsg.textContent = '✓ Password updated! Logging you in…';
+    resetMsg.className = 'auth-msg success';
+    setTimeout(() => {
+      resetPanel.style.display = 'none';
+      authPanel.style.display = '';
+      newPass.value = '';
+      newPass2.value = '';
+      resetMsg.textContent = '';
+    }, 1500);
   });
 
   async function refreshUI(session){
@@ -942,11 +1239,220 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
     filesHeadText.textContent = isAdmin ? 'ALL CLIENT FILES' : 'YOUR FILES';
     adminUploadRow.style.display = isAdmin ? 'block' : 'none';
 
-    if(isAdmin) await loadClientList();
+    projectCard.style.display = 'block';
+    if(isAdmin){
+      await loadClientList();
+      renderAdminProjectView();
+    } else {
+      await loadClientProject();
+    }
     await listFiles();
   }
 
-  /* ⬇️ UPDATED — Ab client ka email dikhega UUID ki jagah */
+  /* ═══════════════════════════════════════════════
+     PROJECT DETAILS — Client form + Admin view
+     ═══════════════════════════════════════════════ */
+  function escapeHtml(s){
+    if(s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function loadClientProject(){
+    pcTitle.textContent = '📋 PROJECT DETAILS';
+    pcStatusWrap.style.display = 'none';
+    pcBody.innerHTML = '<div class="pc-empty">Loading…</div>';
+
+    const { data, error } = await sb.from('project_requests')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if(error){ pcBody.innerHTML = '<div class="pc-empty">Error: ' + escapeHtml(error.message) + '</div>'; return; }
+    const row = data && data[0];
+    if(row){ renderClientSummary(row); }
+    else { renderClientForm(null); }
+  }
+
+  function renderClientForm(existing){
+    const meta = currentUser.user_metadata || {};
+    const name = existing?.name || meta.full_name || '';
+    const business = existing?.business_name || meta.business_name || '';
+    const email = existing?.email || currentUser.email;
+    const phone = existing?.phone || '';
+    const service = existing?.service || '';
+    const requirement = existing?.requirement || '';
+
+    pcBody.innerHTML = `
+      <form id="projectForm">
+        <div class="pc-field">
+          <label>NAME</label>
+          <input type="text" id="prName" value="${escapeHtml(name)}" required placeholder="Your name" />
+        </div>
+        <div class="pc-field">
+          <label>BUSINESS NAME</label>
+          <input type="text" id="prBusiness" value="${escapeHtml(business)}" placeholder="Optional" />
+        </div>
+        <div class="pc-field">
+          <label>EMAIL</label>
+          <input type="email" id="prEmail" value="${escapeHtml(email)}" required placeholder="you@example.com" />
+        </div>
+        <div class="pc-field">
+          <label>PHONE / WHATSAPP</label>
+          <input type="text" id="prPhone" value="${escapeHtml(phone)}" required placeholder="+91 98765 43210" />
+        </div>
+        <div class="pc-field">
+          <label>SERVICE NEEDED</label>
+          <select id="prService" required>
+            <option value="">-- Select a service --</option>
+            <option ${service==='Data Analysis'?'selected':''}>Data Analysis</option>
+            <option ${service==='Dashboard (Power BI / Looker)'?'selected':''}>Dashboard (Power BI / Looker)</option>
+            <option ${service==='Report / Insights'?'selected':''}>Report / Insights</option>
+            <option ${service==='ETL Pipeline'?'selected':''}>ETL Pipeline</option>
+            <option ${service==='Machine Learning'?'selected':''}>Machine Learning</option>
+            <option ${service==='Other'?'selected':''}>Other</option>
+          </select>
+        </div>
+        <div class="pc-field">
+          <label>REQUIREMENT</label>
+          <textarea id="prRequirement" required placeholder="Describe what you need...">${escapeHtml(requirement)}</textarea>
+        </div>
+        <div class="pc-actions">
+          <button type="submit" class="btn btn-primary" style="justify-content:center;">${existing?'Update Details →':'Submit Details →'}</button>
+        </div>
+        <div id="prMsg" class="auth-msg" style="margin-top:6px;"></div>
+      </form>
+    `;
+
+    document.getElementById('projectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('prMsg');
+      msg.textContent = 'Saving…';
+      msg.className = 'auth-msg';
+
+      const payload = {
+        user_id: currentUser.id,
+        name: document.getElementById('prName').value.trim(),
+        business_name: document.getElementById('prBusiness').value.trim(),
+        email: document.getElementById('prEmail').value.trim(),
+        phone: document.getElementById('prPhone').value.trim(),
+        service: document.getElementById('prService').value,
+        requirement: document.getElementById('prRequirement').value.trim(),
+        status: existing?.status || 'new'
+      };
+
+      let err;
+      if(existing){
+        const r = await sb.from('project_requests').update(payload).eq('uuid', existing.uuid);
+        err = r.error;
+      } else {
+        const r = await sb.from('project_requests').insert(payload);
+        err = r.error;
+      }
+
+      if(err){
+        msg.textContent = '✗ ' + err.message;
+        msg.className = 'auth-msg error';
+        return;
+      }
+      msg.textContent = '✓ Saved!';
+      msg.className = 'auth-msg success';
+      setTimeout(() => loadClientProject(), 800);
+    });
+  }
+
+  function renderClientSummary(row){
+    pcStatusWrap.style.display = '';
+    pcStatus.setAttribute('data-status', row.status || 'new');
+    pcStatus.textContent = (row.status || 'new').toUpperCase().replace('_',' ');
+
+    pcBody.innerHTML = `
+      <div class="pc-summary">
+        <div class="pc-summary-row"><div class="k">NAME</div><div class="v">${escapeHtml(row.name || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">BUSINESS</div><div class="v">${escapeHtml(row.business_name || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">EMAIL</div><div class="v">${escapeHtml(row.email || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">PHONE</div><div class="v">${escapeHtml(row.phone || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">SERVICE</div><div class="v">${escapeHtml(row.service || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">REQUIREMENT</div><div class="v">${escapeHtml(row.requirement || '—')}</div></div>
+      </div>
+      <div class="pc-actions" style="margin-top:14px;">
+        <button class="btn btn-outline" id="pcEditBtn" style="padding:9px 16px; font-size:13px;">Edit Details</button>
+      </div>
+    `;
+    document.getElementById('pcEditBtn').addEventListener('click', () => renderClientForm(row));
+  }
+
+  async function renderAdminProjectView(){
+    pcTitle.textContent = "📋 CLIENT'S PROJECT DETAILS";
+    pcStatusWrap.style.display = 'none';
+
+    const uid = clientSelect.value;
+    if(!uid){
+      pcBody.innerHTML = '<div class="pc-empty">Select a client above to view their project details.</div>';
+      return;
+    }
+    pcBody.innerHTML = '<div class="pc-empty">Loading…</div>';
+
+    const { data, error } = await sb.from('project_requests')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if(error){ pcBody.innerHTML = '<div class="pc-empty">Error: ' + escapeHtml(error.message) + '</div>'; return; }
+    const row = data && data[0];
+    if(!row){
+      pcBody.innerHTML = '<div class="pc-empty">This client has not submitted their project details yet.</div>';
+      return;
+    }
+
+    pcStatusWrap.style.display = '';
+    pcStatus.setAttribute('data-status', row.status || 'new');
+    pcStatus.textContent = (row.status || 'new').toUpperCase().replace('_',' ');
+
+    pcBody.innerHTML = `
+      <div class="pc-summary">
+        <div class="pc-summary-row"><div class="k">NAME</div><div class="v">${escapeHtml(row.name || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">BUSINESS</div><div class="v">${escapeHtml(row.business_name || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">EMAIL</div><div class="v">${escapeHtml(row.email || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">PHONE</div><div class="v">${escapeHtml(row.phone || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">SERVICE</div><div class="v">${escapeHtml(row.service || '—')}</div></div>
+        <div class="pc-summary-row"><div class="k">REQUIREMENT</div><div class="v">${escapeHtml(row.requirement || '—')}</div></div>
+      </div>
+      <div class="pc-field" style="margin-top:16px;">
+        <label>STATUS (ADMIN ONLY)</label>
+        <select id="adminStatusSelect">
+          <option value="new" ${row.status==='new'?'selected':''}>new</option>
+          <option value="contacted" ${row.status==='contacted'?'selected':''}>contacted</option>
+          <option value="quoted" ${row.status==='quoted'?'selected':''}>quoted</option>
+          <option value="in_progress" ${row.status==='in_progress'?'selected':''}>in progress</option>
+          <option value="completed" ${row.status==='completed'?'selected':''}>completed</option>
+        </select>
+      </div>
+      <div class="pc-actions" style="margin-top:10px;">
+        <button class="btn btn-primary" id="adminStatusSaveBtn" style="padding:9px 16px; font-size:13px;">Update Status</button>
+      </div>
+      <div id="adminPcMsg" class="auth-msg" style="margin-top:6px;"></div>
+    `;
+
+    document.getElementById('adminStatusSaveBtn').addEventListener('click', async () => {
+      const newStatus = document.getElementById('adminStatusSelect').value;
+      const msg = document.getElementById('adminPcMsg');
+      msg.textContent = 'Updating…';
+      msg.className = 'auth-msg';
+      const { error } = await sb.from('project_requests').update({ status: newStatus }).eq('uuid', row.uuid);
+      if(error){ msg.textContent = '✗ ' + error.message; msg.className = 'auth-msg error'; return; }
+      msg.textContent = '✓ Status updated';
+      msg.className = 'auth-msg success';
+      setTimeout(() => renderAdminProjectView(), 800);
+    });
+  }
+
+  // Admin dropdown change → reload that client's project
+  clientSelect.addEventListener('change', () => {
+    if(isAdmin) renderAdminProjectView();
+  });
+
   async function loadClientList(){
     const { data: folders } = await sb.storage.from(BUCKET).list('', { limit: 100 });
     const clientFolders = (folders || []).filter(f => !f.id && f.name);
@@ -954,21 +1460,37 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
       clientSelect.innerHTML = '<option value="">-- No clients yet --</option>';
       return;
     }
-    // Saare profiles fetch karo (simpler + reliable)
-    const { data: profiles } = await sb.from('profiles').select('id, email');
-    const emailMap = {};
-    (profiles || []).forEach(p => { emailMap[p.id] = p.email; });
+    const { data: profiles } = await sb.from('profiles').select('id, email, full_name, business_name');
+    const infoMap = {};
+    (profiles || []).forEach(p => { infoMap[p.id] = p; });
 
     const current = clientSelect.value;
     clientSelect.innerHTML = '<option value="">-- Select a client --</option>' +
       clientFolders.map(f => {
-        const email = emailMap[f.name] || `Client ${f.name.slice(0,8)}…${f.name.slice(-4)}`;
-        return `<option value="${f.name}">${email}</option>`;
+        const p = infoMap[f.name];
+        let label;
+        if(p && p.full_name){
+          label = p.full_name + (p.business_name ? ' — ' + p.business_name : '') + ' (' + p.email + ')';
+        } else if(p && p.email){
+          label = p.email;
+        } else {
+          label = 'Client ' + f.name.slice(0,8) + '…' + f.name.slice(-4);
+        }
+        return `<option value="${f.name}">${label}</option>`;
       }).join('');
     if(current) clientSelect.value = current;
   }
 
-  sb.auth.onAuthStateChange((_event, session) => { refreshUI(session); });
+  sb.auth.onAuthStateChange((event, session) => {
+    if(event === 'PASSWORD_RECOVERY'){
+      authPanel.style.display = 'none';
+      dashboard.style.display = 'none';
+      resetPanel.style.display = '';
+      history.replaceState(null, '', window.location.pathname);
+      return;
+    }
+    refreshUI(session);
+  });
   sb.auth.getSession().then(({ data }) => refreshUI(data.session));
 
   async function listFiles(){
@@ -1018,7 +1540,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
         <div class="file-icon">${fileIconSvg(f.name)}</div>
         <div class="file-info">
           <div class="file-name">${displayName}${isFromAdmin ? '<span class="from-admin-badge">FROM ADMIN</span>' : ''}</div>
-          <div class="file-meta">${formatBytes(f.metadata?.size)}${isAdmin ? ' · ' + folder.slice(0,8) + '…' : ''}</div>
+          <div class="file-meta">${formatBytes(f.metadata?.size)} · ${timeAgo(f.updated_at || f.created_at)}${isAdmin ? ' · ' + folder.slice(0,8) + '…' : ''}</div>
         </div>
         <div class="file-actions">
           <button class="icon-btn" data-act="download" title="Download">
